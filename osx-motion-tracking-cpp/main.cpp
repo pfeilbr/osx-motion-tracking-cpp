@@ -215,7 +215,7 @@ void renderFrameCallback() {
     posY = moment01/area;
 
 
-    // removed the drawing of line for performance
+    // removed the drawing of tracking line for performance
     /*
     if(lastX>0 && lastY>0 && posX>0 && posY>0) {
         cvLine(imgScribble, cvPoint(posX, posY), cvPoint(lastX, lastY), cvScalar(0,255,255), 5);
