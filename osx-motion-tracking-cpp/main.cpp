@@ -9,6 +9,7 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <GLUT/glut.h>
+#include <ctime>
 
 using namespace cv;
 using namespace std;
@@ -16,12 +17,26 @@ using namespace std;
 /* global variables */
 int screenWidth = 0;
 int screenHeight = 0;
+int frameWidth = 0;
+int frameHeight = 0;
+
 CvCapture* capture = 0;
 IplImage* imgScribble = NULL;
 double rotate_y=0;
 double rotate_x=0;
 static int posX = 0;
 static int posY = 0;
+
+clock_t deltaTime = 0;
+unsigned int frames = 0;
+double  frameRate = 30;
+double  averageFrameTimeMilliseconds = 33.333;
+
+double clockToMilliseconds(clock_t ticks){
+    // units/(units/time) => time (seconds) * 1000 = milliseconds
+    return (ticks/(double)CLOCKS_PER_SEC)*1000.0;
+}
+
 
 void showImage() {
     Mat image;
@@ -183,8 +198,7 @@ double normalize(double x)
     return (x*2)-1;
 }
 
-void renderFrameCallback() {
-    
+void opencvFrameCallback() {
     // opencv stuff here
     
     // Will hold a frame captured from the camera
@@ -192,9 +206,7 @@ void renderFrameCallback() {
     IplImage* rawFrame = 0;
     rawFrame = cvQueryFrame(capture);
 
-    const int frameWidth = screenWidth/2;
-    const int frameHeigth = screenHeight/2;
-    frame = cvCreateImage(cvSize(frameWidth, frameHeigth), rawFrame->depth, rawFrame->nChannels);
+    frame = cvCreateImage(cvSize(frameWidth, frameHeight), rawFrame->depth, rawFrame->nChannels);
     cvResize(rawFrame, frame);
 
     if(imgScribble == NULL) {
@@ -225,8 +237,8 @@ void renderFrameCallback() {
     cvShowImage("thresh", imgYellowThresh);
     */
     cvShowImage("video", frame);
+    //putText(frame, "Tracking failure detected", Point(100,80), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0,0,255),2);
     
-
     /*
     int c = cvWaitKey(1);
     if(c != -1) {
@@ -239,15 +251,16 @@ void renderFrameCallback() {
     delete moments;
 
     glutPostRedisplay();
-    
-    //  Clear screen and Z-buffer
+}
+
+void openGLFrameCallback() {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
     // Reset transformations
     glLoadIdentity();
 
     GLfloat xRatio = (GLfloat)posX/frameWidth;
-    GLfloat yRatio = (GLfloat)posY/frameHeigth;
+    GLfloat yRatio = (GLfloat)posY/frameHeight;
     GLfloat translateX = -normalize(xRatio);
     GLfloat translateY = -normalize(yRatio);
     GLfloat translateZ = -1.0;
@@ -318,6 +331,25 @@ void renderFrameCallback() {
     glutSwapBuffers();
 }
 
+void renderFrameCallback() {
+    clock_t beginFrame = clock();
+    opencvFrameCallback();
+    openGLFrameCallback();
+    clock_t endFrame = clock();
+
+    deltaTime += endFrame - beginFrame;
+    frames ++;
+
+    //if you really want FPS
+    if( clockToMilliseconds(deltaTime)>1000.0){ //every second
+        frameRate = (double)frames*0.5 +  frameRate*0.5; //more stable
+        frames = 0;
+        deltaTime -= CLOCKS_PER_SEC;
+        averageFrameTimeMilliseconds  = 1000.0/(frameRate==0?0.001:frameRate);
+        std::cout<<"FrameTime was:"<<averageFrameTimeMilliseconds<<std::endl;
+    }    
+}
+
 void specialKeys( int key, int x, int y ) {
     
     //  Right arrow - increase rotation by 5 degree
@@ -355,6 +387,10 @@ void openCVAndOpenGL()
     screenWidth = glutGet(GLUT_SCREEN_WIDTH);
     screenHeight = glutGet(GLUT_SCREEN_HEIGHT);
     printf("screenWidth=%d, screenHeight=%d\n", screenWidth, screenHeight);
+
+    frameWidth = screenWidth/2;
+    frameHeight = screenHeight/2;
+    printf("frameWidth=%d, frameHeight=%d\n", frameWidth, frameHeight);
 
     glutInitDisplayMode(GLUT_SINGLE);
     glutInitWindowSize(screenWidth/2, screenHeight/2);
