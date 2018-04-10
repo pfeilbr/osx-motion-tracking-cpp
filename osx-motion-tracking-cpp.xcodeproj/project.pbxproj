@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		C58D0A6C20795A58001CD038 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C58D0A6B20795A58001CD038 /* main.cpp */; };
+		C5D072DE207AA4A800323BAC /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5D072DD207AA4A800323BAC /* OpenGL.framework */; };
+		C5D072E0207AA4B500323BAC /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5D072DF207AA4B500323BAC /* GLUT.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +27,8 @@
 /* Begin PBXFileReference section */
 		C58D0A6820795A58001CD038 /* osx-motion-tracking-cpp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "osx-motion-tracking-cpp"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C58D0A6B20795A58001CD038 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		C5D072DD207AA4A800323BAC /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		C5D072DF207AA4B500323BAC /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +36,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5D072E0207AA4B500323BAC /* GLUT.framework in Frameworks */,
+				C5D072DE207AA4A800323BAC /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -43,6 +49,7 @@
 			children = (
 				C58D0A6A20795A58001CD038 /* osx-motion-tracking-cpp */,
 				C58D0A6920795A58001CD038 /* Products */,
+				C5D072DC207AA4A700323BAC /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -60,6 +67,15 @@
 				C58D0A6B20795A58001CD038 /* main.cpp */,
 			);
 			path = "osx-motion-tracking-cpp";
+			sourceTree = "<group>";
+		};
+		C5D072DC207AA4A700323BAC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C5D072DF207AA4B500323BAC /* GLUT.framework */,
+				C5D072DD207AA4A800323BAC /* OpenGL.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -238,6 +254,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				OTHER_LDFLAGS = (
+					"-lopencv_dnn",
+					"-lopencv_ml",
+					"-lopencv_objdetect",
+					"-lopencv_shape",
+					"-lopencv_stitching",
+					"-lopencv_superres",
+					"-lopencv_videostab",
+					"-lopencv_calib3d",
+					"-lopencv_features2d",
+					"-lopencv_highgui",
+					"-lopencv_videoio",
+					"-lopencv_imgcodecs",
+					"-lopencv_video",
+					"-lopencv_photo",
+					"-lopencv_imgproc",
+					"-lopencv_flann",
+					"-lopencv_core",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -246,6 +283,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				OTHER_LDFLAGS = (
+					"-lopencv_dnn",
+					"-lopencv_ml",
+					"-lopencv_objdetect",
+					"-lopencv_shape",
+					"-lopencv_stitching",
+					"-lopencv_superres",
+					"-lopencv_videostab",
+					"-lopencv_calib3d",
+					"-lopencv_features2d",
+					"-lopencv_highgui",
+					"-lopencv_videoio",
+					"-lopencv_imgcodecs",
+					"-lopencv_video",
+					"-lopencv_photo",
+					"-lopencv_imgproc",
+					"-lopencv_flann",
+					"-lopencv_core",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
