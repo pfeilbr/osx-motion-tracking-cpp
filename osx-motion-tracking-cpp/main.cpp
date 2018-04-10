@@ -14,6 +14,8 @@ using namespace cv;
 using namespace std;
 
 /* global variables */
+int screenWidth = 0;
+int screenHeight = 0;
 CvCapture* capture = 0;
 IplImage* imgScribble = NULL;
 double rotate_y=0;
@@ -176,13 +178,24 @@ void openCVopenGLExample()
     cv::waitKey(0);
 }
 
+double normalize(double x)
+{
+    return (x*2)-1;
+}
+
 void renderFrameCallback() {
     
     // opencv stuff here
     
     // Will hold a frame captured from the camera
     IplImage* frame = 0;
-    frame = cvQueryFrame(capture);
+    IplImage* rawFrame = 0;
+    rawFrame = cvQueryFrame(capture);
+
+    const int frameWidth = screenWidth/2;
+    const int frameHeigth = screenHeight/2;
+    frame = cvCreateImage(cvSize(frameWidth, frameHeigth), rawFrame->depth, rawFrame->nChannels);
+    cvResize(rawFrame, frame);
 
     if(imgScribble == NULL) {
         imgScribble = cvCreateImage(cvGetSize(frame), 8, 3);
@@ -227,19 +240,18 @@ void renderFrameCallback() {
     
     // Reset transformations
     glLoadIdentity();
-    
-    glTranslatef(((GLfloat)posX/-1280.0), ((GLfloat)posY/-720.0), -1.0);
-    
-    // Other Transformations
-    // glTranslatef( 0.1, 0.0, 0.0 );      // Not included
-    // glRotatef( 180, 0.0, 1.0, 0.0 );    // Not included
-    
-    // Rotate when user changes rotate_x and rotate_y
+
+    GLfloat xRatio = (GLfloat)posX/frameWidth;
+    GLfloat yRatio = (GLfloat)posY/frameHeigth;
+    GLfloat translateX = -normalize(xRatio);
+    GLfloat translateY = -normalize(yRatio);
+    GLfloat translateZ = -1.0;
+    glTranslatef(translateX, translateY, translateZ);
+        
     glRotatef( rotate_x, 1.0, 0.0, 0.0 );
-    glRotatef( rotate_y, 0.0, 1.0, 0.0 );
+    glRotatef( rotate_y, 0.0, 1.0, 0.0);
     
-    // Other Transformations
-    // glScalef( 2.0, 2.0, 0.0 );          // Not included
+    //glScalef( 0.75, 0.75, 0.0 );
     
     //Multi-colored side - FRONT
     glBegin(GL_POLYGON);
@@ -299,8 +311,6 @@ void renderFrameCallback() {
     
     glFlush();
     glutSwapBuffers();
-    
-
 }
 
 void specialKeys( int key, int x, int y ) {
@@ -336,13 +346,23 @@ void openCVAndOpenGL()
     // *** opengl **
     int num = 0;
     glutInit(&num, NULL);
+
+    screenWidth = glutGet(GLUT_SCREEN_WIDTH);
+    screenHeight = glutGet(GLUT_SCREEN_HEIGHT);
+    printf("screenWidth=%d, screenHeight=%d\n", screenWidth, screenHeight);
+
     glutInitDisplayMode(GLUT_SINGLE);
-    glutInitWindowSize(1280, 720);
-    glutInitWindowPosition(100, 100);
-    glutCreateWindow("Hello world :D");
+    glutInitWindowSize(screenWidth/2, screenHeight/2);
+    glutInitWindowPosition(0, 0);
+    glutCreateWindow("Cube");
     
     cvNamedWindow("video", WINDOW_OPENGL);
+    resizeWindow("video", screenWidth/2, screenHeight/2);
+    moveWindow("video", 0, screenHeight/2);
+
     cvNamedWindow("thresh", WINDOW_OPENGL);
+    resizeWindow("thresh", screenWidth/2, screenHeight/2);
+    moveWindow("thresh", screenWidth/2, screenHeight/2);
 
     glutDisplayFunc(renderFrameCallback);
     glutSpecialFunc(specialKeys);
